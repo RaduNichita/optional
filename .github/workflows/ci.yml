@@ -26,6 +26,7 @@ jobs:
           - {name: "Ubuntu Clang 19", os: ubuntu-24.04, toolchain: "clang-19", clang_version: 19, installed_clang_version: 17, cmake_args: "-G \"Ninja Multi-Config\" -DCMAKE_CONFIGURATION_TYPES=\"RelWithDebInfo;Asan\" ", asan_options: "new_delete_type_mismatch=0"}
           - {name: "Ubuntu Clang 18", os: ubuntu-24.04, toolchain: "clang-18", clang_version: 18, installed_clang_version: 17, cmake_args: "-G \"Ninja Multi-Config\" -DCMAKE_CONFIGURATION_TYPES=\"RelWithDebInfo;Asan\" "}
           - {name: "Ubuntu Clang 17", os: ubuntu-24.04, toolchain: "clang-17", clang_version: 17, installed_clang_version: 17, cmake_args: "-G \"Ninja Multi-Config\" -DCMAKE_CONFIGURATION_TYPES=\"RelWithDebInfo;Asan\" "}
+          - {name: "Ubuntu Clang 16", os: ubuntu-22.04, toolchain: "clang-16", clang_version: 16, installed_clang_version: 14, cmake_args: "-G \"Ninja Multi-Config\" -DCMAKE_CONFIGURATION_TYPES=\"RelWithDebInfo;Asan\" "}
           - {name: "Ubuntu GCC 14", os: ubuntu-24.04, toolchain: "gcc-14", cmake_args: "-G \"Ninja Multi-Config\" -DCMAKE_CONFIGURATION_TYPES=\"RelWithDebInfo;Asan;Gcov\" ", coverage: true}
           - {name: "Ubuntu GCC 13", os: ubuntu-24.04, toolchain: "gcc-13",  cmake_args: "-G \"Ninja Multi-Config\" -DCMAKE_CONFIGURATION_TYPES=\"RelWithDebInfo;Asan\" "}
           - {name: "Ubuntu GCC 12", os: ubuntu-24.04, toolchain: "gcc-12",  cmake_args: "-G \"Ninja Multi-Config\" -DCMAKE_CONFIGURATION_TYPES=\"RelWithDebInfo;Asan\" "}
@@ -69,7 +70,8 @@ jobs:
           # Link Clang libraries (if not done by llvm.sh - some links are already set).
           sudo ln -fs /usr/lib/llvm-${CLANG_VERSION}/lib/lib* /usr/lib/x86_64-linux-gnu/ || true
           # If Clang 17, install a newer version of libc++ and libc++abi.
-          [[ ${CLANG_VERSION} = 17 ]] && sudo apt-get install libc++-dev libc++1 libc++abi-dev libc++abi1
+          sudo apt install libc++-${CLANG_VERSION}-dev libc++abi-${CLANG_VERSION}-dev
+          # [[ ${CLANG_VERSION} = 17 ]] && sudo apt-get install libc++-dev libc++1 libc++abi-dev libc++abi1
           find /usr/lib/x86_64-linux-gnu/ -name libc++.so* || true
           clang++-${CLANG_VERSION} --version
       - name: Install GCC
@@ -90,7 +92,7 @@ jobs:
         run: |
           set -x
           sudo apt-get install gcovr
-      - name: CMake Configure
+      - name: Configure CMake
         run: |
           set -x
           echo ${{ matrix.config.cmake_args }}
